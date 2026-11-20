@@ -1,0 +1,10 @@
+# Excluir carpeta de documentos de entrega y archivos temporales de compilación
+Entrega Proyecto Final/
+*.log
+*.aux
+*.toc
+*.out
+*.nav
+*.snm
+.DS_Store
+Thumbs.db
