@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comidas y Rutas Uninorte</title>
+  <style>
+    /* ========================================================================
+       DISEÑO BÁSICO Y SIMPLE — ROJO Y NEGRO UNINORTE (CLARO / OSCURO)
+       ======================================================================== */
+    :root {
+      --bg-app: #ffffff;
+      --bg-superficie: #ffffff;
+      --bg-secundario: #f6f6f6;
+      --bg-terciario: #eaeaea;
+      --bg-hover-fila: #f4f4f4;
+      --borde-suave: #cccccc;
+      --borde-fuerte: #999999;
+      --texto-principal: #111111;
+      --texto-secundario: #333333;
+      --texto-terciario: #555555;
+
+      --acento-rojo: #c8102e;
+      --acento-rojo-hover: #9e0b22;
+      --acento-rojo-suave: #fcebed;
+      --acento-rojo-borde: #d98290;
+      --negro-uninorte: #111111;
+      --texto-sobre-rojo: #ffffff;
+
+      --verde-campus: #111111;
+      --verde-suave: #efefef;
+      --ambar-campus: #a30d25;
+      --ambar-suave: #fcebed;
+      --morado-emp: #111111;
+      --morado-suave: #e8e8e8;
+      --rojo-error: #c8102e;
+      --rojo-suave: #fcebed;
+    }
+
+    html[data-tema="oscuro"] {
+      --bg-app: #121212;
+      --bg-superficie: #1a1a1a;
+      --bg-secundario: #222222;
+      --bg-terciario: #2c2c2c;
+      --bg-hover-fila: #262626;
+      --borde-suave: #3a3a3a;
+      --borde-fuerte: #555555;
+      --texto-principal: #f0f0f0;
+      --texto-secundario: #cccccc;
+      --texto-terciario: #999999;
+
+      --acento-rojo: #d91938;
+      --acento-rojo-hover: #f02848;
+      --acento-rojo-suave: #331419;
+      --acento-rojo-borde: #802332;
+      --negro-uninorte: #0a0a0a;
+      --texto-sobre-rojo: #ffffff;
+
+      --verde-campus: #f0f0f0;
+      --verde-suave: #2b2b2b;
+      --ambar-campus: #ff758c;
+      --ambar-suave: #331419;
+      --morado-emp: #f0f0f0;
+      --morado-suave: #2b2b2b;
+      --rojo-error: #ff758c;
+      --rojo-suave: #331419;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      color: var(--texto-principal);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    /* CABECERA BÁSICA EN NEGRO Y ROJO */
+    .cabecera-sitio {
+      background-color: var(--negro-uninorte);
+      color: #ffffff;
+      border-bottom: 3px solid var(--acento-rojo);
+    }
+
+    .cabecera-interior {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .marca-sitio {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .insignia-un {
+      background-color: var(--acento-rojo);
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+
+    .marca-textos h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .marca-textos p {
+      margin: 0;
+      font-size: 12px;
+      color: #cccccc;
+    }
+
+    .controles-cabecera {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .barra-pestanas {
+      display: flex;
+      gap: 4px;
+    }
+
+    .barra-pestanas button {
+      border: 1px solid #555555;
+      background-color: #222222;
+      color: #e0e0e0;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .barra-pestanas button:hover {
+      background-color: #333333;
+      color: #ffffff;
+    }
+
+    .barra-pestanas button.pestana-activa {
+      background-color: var(--acento-rojo);
+      border-color: var(--acento-rojo);
+      color: #ffffff;
+    }
+
+    .btn-modo-tema {
+      background-color: #222222;
+      color: #ffffff;
+      border: 1px solid #555555;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-modo-tema:hover {
+      border-color: var(--acento-rojo);
+    }
+
+    .pestana-oculta,
+    .paso-oculto {
+      display: none !important;
+    }
+
+    .contenedor-principal {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* BARRA DE PASOS (1 AL 5) */
+    .barra-pasos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--borde-suave);
+    }
+
+    .barra-pasos button {
+      border: 1px solid var(--borde-fuerte);
+      background-color: var(--bg-secundario);
+      color: var(--texto-principal);
+      font-size: 13px;
+      font-weight: bold;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    .barra-pasos button.paso-activo {
+      background-color: var(--acento-rojo);
+      border-color: var(--acento-rojo);
+      color: #ffffff;
+    }
+
+    /* FIELDSETS Y CAJAS SIMPLES */
+    fieldset {
+      border: 1px solid var(--borde-suave);
+      background-color: var(--bg-superficie);
+      padding: 14px 16px;
+      margin: 0 0 14px 0;
+    }
+
+    fieldset fieldset {
+      background-color: var(--bg-secundario);
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    legend {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--texto-principal);
+      padding: 0 6px;
+    }
+
+    .subtitulo-seccion {
+      margin: 0 0 10px 0;
+      color: var(--texto-secundario);
+      font-size: 13px;
+    }
+
+    .fila-control {
+      margin-bottom: 12px;
+    }
+
+    /* BOTONES BÁSICOS */
+    button {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 12px;
+      border: 1px solid var(--borde-fuerte);
+      background-color: var(--bg-secundario);
+      color: var(--texto-principal);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--bg-terciario);
+      border-color: var(--acento-rojo);
+    }
+
+    .btn-primario {
+      background-color: var(--acento-rojo);
+      border-color: var(--acento-rojo);
+      color: #ffffff;
+    }
+
+    .btn-primario:hover {
+      background-color: var(--acento-rojo-hover);
+      border-color: var(--acento-rojo-hover);
+      color: #ffffff;
+    }
+
+    .btn-secundario {
+      background-color: var(--bg-secundario);
+      border-color: var(--borde-fuerte);
+      color: var(--texto-principal);
+    }
+
+    /* CAJAS DE CATEGORÍAS Y PREFERENCIAS */
+    .grid-preferencias {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .caja-categoria {
+      border: 1px solid var(--borde-suave);
+      background-color: var(--bg-secundario);
+      padding: 10px;
+    }
+
+    .caja-categoria > label,
+    .caja-categoria > strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--texto-principal);
+      padding-bottom: 5px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--borde-suave);
+      cursor: pointer;
+    }
+
+    .lista-subcategorias {
+      list-style: none;
+      padding-left: 4px;
+      margin: 0;
+    }
+
+    .lista-subcategorias li {
+      margin-bottom: 4px;
+    }
+
+    .lista-subcategorias label {
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--texto-secundario);
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      accent-color: var(--acento-rojo);
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--texto-principal);
+      background-color: var(--bg-superficie);
+      border: 1px solid var(--borde-fuerte);
+      padding: 5px 8px;
+    }
+
+    input[type="number"] {
+      width: 110px;
+    }
+
+    input[type="range"] {
+      width: 260px;
+      max-width: 100%;
+      accent-color: var(--acento-rojo);
+      vertical-align: middle;
+    }
+
+    .panel-presupuesto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .tarjeta-control-presupuesto {
+      background-color: var(--bg-secundario);
+      border: 1px solid var(--borde-suave);
+      padding: 12px;
+    }
+
+    .atajos-presupuesto {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .btn-chip-precio {
+      font-size: 12px;
+      padding: 3px 8px;
+      background-color: var(--bg-superficie);
+      border: 1px solid var(--borde-fuerte);
+    }
+
+    .aviso-resumen {
+      background-color: var(--bg-secundario);
+      border: 1px solid var(--borde-suave);
+      border-left: 4px solid var(--acento-rojo);
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .aviso-resumen ul {
+      margin: 4px 0;
+      padding-left: 18px;
+    }
+
+    .barra-filtros-upwork {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background-color: var(--bg-secundario);
+      padding: 10px 12px;
+      border: 1px solid var(--borde-suave);
+    }
+
+    /* TABLAS BÁSICAS CON BORDES VISIBLES */
+    .contenedor-tabla-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background-color: var(--bg-superficie);
+    }
+
+    th, td {
+      border: 1px solid var(--borde-suave);
+      padding: 7px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--bg-terciario);
+      color: var(--texto-principal);
+      font-weight: bold;
+    }
+
+    tbody tr:hover {
+      background-color: var(--bg-hover-fila);
+    }
+
+    .etiqueta-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 1px solid var(--borde-suave);
+      background-color: var(--bg-secundario);
+    }
+
+    .precio-destacado {
+      font-weight: bold;
+      color: var(--texto-principal);
+    }
+
+    .texto-suave {
+      color: var(--texto-secundario);
+      font-size: 12px;
+    }
+
+    a.vinculo-llegar {
+      display: inline-block;
+      font-weight: bold;
+      font-size: 12px;
+      color: #ffffff;
+      background-color: var(--acento-rojo);
+      padding: 4px 8px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.vinculo-llegar:hover {
+      background-color: var(--acento-rojo-hover);
+    }
+
+    .acciones-paso {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--borde-suave);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* MAPA DEL CAMPUS */
+    .barra-herramientas-mapa {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background-color: var(--bg-secundario);
+      border: 1px solid var(--borde-suave);
+      padding: 8px 12px;
+      margin-bottom: 10px;
+    }
+
+    .contenedor-mapa {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto 14px auto;
+      border: 2px solid var(--borde-fuerte);
+      background: #e6eef4;
+    }
+
+    .contenedor-mapa svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .leyenda-mapa {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--texto-secundario);
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background-color: var(--bg-secundario);
+      border: 1px solid var(--borde-suave);
+    }
+
+    .item-leyenda {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .punto-leyenda {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid #fff;
+    }
+
+    .grid-formulario-emp {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .grid-formulario-emp input[type="text"],
+    .grid-formulario-emp select,
+    .grid-formulario-emp input[type="number"] {
+      width: 100%;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABECERA DEL SITIO (ESTILO UPWORK TOP NAV + TOGGLE MODO OSCURO) -->
+  <header class="cabecera-sitio">
+    <div class="cabecera-interior">
+      <div class="marca-sitio">
+        <div class="insignia-un">UN</div>
+        <div class="marca-textos">
+          <h1>Comidas y Rutas Uninorte</h1>
+          <p>Restaurantes, Cafeterías y Emprendimientos del Campus</p>
+        </div>
+      </div>
+
+      <div class="controles-cabecera">
+        <!-- BARRA SUPERIOR DE PESTAÑAS PRINCIPALES -->
+        <nav class="barra-pestanas" aria-label="Secciones principales">
+          <button type="button" id="btnTabApp" class="pestana-activa">1. Buscar qué comer</button>
+          <button type="button" id="btnTabEmprendimientos">2. Publicar emprendimiento</button>
+        </nav>
+
+        <!-- BOTÓN DE CAMBIO ENTRE MODO CLARO Y MODO OSCURO -->
+        <button type="button" id="btnAlternarTema" class="btn-modo-tema" onclick="alternarTemaVisual()" title="Cambiar entre modo claro y modo oscuro">
+          <span id="iconoTemaVisual" class="icono-tema">&#9790;</span>
+          <span id="textoTemaVisual">Modo oscuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenedor-principal">
+
+    <!-- ==================================================================== -->
+    <!-- PESTAÑA 1: APLICACIÓN PARA EL USUARIO (FLUJO POR PASOS)              -->
+    <!-- ==================================================================== -->
+    <div id="vistaPestanaApp">
+
+      <!-- INDICADOR DE PASOS -->
+      <div class="barra-pasos">
+        <button type="button" id="navPaso1" class="paso-activo">1. Tus Gustos</button>
+        <button type="button" id="navPaso2">2. Tu Presupuesto</button>
+        <button type="button" id="navPaso3">3. Menú y Combos</button>
+        <button type="button" id="navPaso4">4. ¿Dónde estás?</button>
+        <button type="button" id="navPaso5">5. Mapa y Ruta</button>
+      </div>
+
+      <!-- PASO 1: PREFERENCIAS DE COMIDA -->
+      <div id="seccionPaso1">
+        <fieldset>
+          <legend>Paso 1: ¿Qué te provoca comer hoy?</legend>
+          <p class="subtitulo-seccion">Filtra por tus categorías favoritas como en un catálogo de especialidades. Si no marcas ninguna, verás todas las opciones del campus.</p>
+
+          <div class="fila-control" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+            <button type="button" id="btnSeleccionarTodo" class="btn-secundario">Seleccionar todas</button>
+            <button type="button" id="btnLimpiarTodo" class="btn-secundario">Limpiar filtros</button>
+            <span id="contadorPreferencias" style="color: var(--texto-secundario); font-size: 13.5px; font-weight: 600;"></span>
+          </div>
+
+          <div id="contenedorPreferencias" class="grid-preferencias"></div>
+
+          <div id="resumenPaso1" class="fila-control aviso-resumen"></div>
+
+          <div class="acciones-paso">
+            <span></span>
+            <button type="button" id="btnIrPaso2" class="btn-primario">Continuar a Presupuesto &rarr;</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- PASO 2: PRESUPUESTO -->
+      <div id="seccionPaso2" class="paso-oculto">
+        <fieldset>
+          <legend>Paso 2: Define tu presupuesto</legend>
+          <p class="subtitulo-seccion">Ajusta cuánto planeas gastar hoy o usa las etiquetas rápidas de bolsillo estudiantil.</p>
+
+          <div id="resumenPreferenciasEnPaso2" class="fila-control aviso-resumen"></div>
+
+          <div class="panel-presupuesto-grid">
+            <div class="tarjeta-control-presupuesto">
+              <label for="inputPresupuestoMax"><strong>Presupuesto Máximo ($ COP):</strong></label>
+              <div style="margin-top: 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <input type="range" id="sliderPresupuestoMax" min="1400" max="62000" step="100" value="25000">
+                <input type="number" id="inputPresupuestoMax" min="1400" max="62000" step="100" value="25000">
+              </div>
+              <div class="atajos-presupuesto">
+                <small style="color: var(--texto-terciario); font-weight: 600;">Rápidos:</small>
+                <button type="button" class="btn-chip-precio" onclick="fijarPresupuestoRapido(8000)">Hasta $8.000</button>
+                <button type="button" class="btn-chip-precio" onclick="fijarPresupuestoRapido(15000)">Hasta $15.000</button>
+                <button type="button" class="btn-chip-precio" onclick="fijarPresupuestoRapido(22000)">Hasta $22.000</button>
+                <button type="button" class="btn-chip-precio" onclick="fijarPresupuestoRapido(35000)">Hasta $35.000</button>
+                <button type="button" class="btn-chip-precio" onclick="fijarPresupuestoRapido(62000)">Sin límite</button>
+              </div>
+            </div>
+
+            <div class="tarjeta-control-presupuesto">
+              <label for="inputPresupuestoMin"><strong>Presupuesto Mínimo ($ COP):</strong></label>
+              <div style="margin-top: 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <input type="range" id="sliderPresupuestoMin" min="0" max="60000" step="100" value="0">
+                <input type="number" id="inputPresupuestoMin" min="0" max="60000" step="100" value="0">
+              </div>
+              <p style="margin: 10px 0 0 0; font-size: 12.5px; color: var(--texto-terciario);">
+                Déjalo en $0 si también quieres incluir snacks, cafés y opciones ligeras.
+              </p>
+            </div>
+          </div>
+
+          <div id="vistaPreviaPaso2" class="fila-control aviso-resumen"></div>
+
+          <div class="acciones-paso">
+            <button type="button" id="btnVolverPaso1" class="btn-secundario">&larr; Volver a Gustos</button>
+            <button type="button" id="btnIrPaso3" class="btn-primario">Ver Menú y Combos Recomendados &rarr;</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- PASO 3: COMIDAS, COMBOS Y LOCALES COMPATIBLES -->
+      <div id="seccionPaso3" class="paso-oculto">
+        <fieldset>
+          <legend>Paso 3: Explora resultados, arma tu combo y elige destino</legend>
+
+          <div class="fila-control barra-filtros-upwork">
+            <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+              <div>
+                <label for="selectFiltroTipoLocal"><strong>Dónde comer:</strong></label>
+                <select id="selectFiltroTipoLocal" style="margin-left: 6px;">
+                  <option value="todos">Todo el campus (Restaurantes + Emprendimientos)</option>
+                  <option value="restaurantes">Solo Restaurantes y Cafeterías du Nord</option>
+                  <option value="emprendimientos">Solo Emprendimientos Estudiantiles</option>
+                  <option value="emprendimientos_activos">Emprendimientos Disponibles Ahora</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="selectOrden"><strong>Ordenar por:</strong></label>
+                <select id="selectOrden" style="margin-left: 6px;">
+                  <option value="afinidad">Mejor coincidencia (Top Match)</option>
+                  <option value="precio_asc">Precio: menor a mayor</option>
+                  <option value="precio_desc">Precio: mayor a menor</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btnVolverPaso1Desde3" class="btn-secundario">&larr; Gustos</button>
+              <button type="button" id="btnVolverPaso2Desde3" class="btn-secundario">&larr; Presupuesto</button>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- CAJA DE LISTA AUTOMÁTICA DE QUÉ COMER -->
+        <fieldset>
+          <legend>Platos y Productos Individuales</legend>
+          <p class="subtitulo-seccion">Haz clic en <strong>Cómo llegar</strong> en cualquier opción para trazar la ruta peatonal desde tu bloque:</p>
+          <div id="contenedorPlatosRecomendados"></div>
+        </fieldset>
+
+        <!-- ARMADOR DE COMBOS DENTRO DEL PRESUPUESTO (DEBAJO DE PLATOS Y PRODUCTOS INDIVIDUALES) -->
+        <fieldset>
+          <legend>Armador de Combos con tu Presupuesto</legend>
+          <p class="subtitulo-seccion">Combina plato fuerte, bebida o postre sin pasarte de tu presupuesto máximo. Si desmarcas "Comprar todo en el mismo lugar", al darle a Cómo llegar verás los 2 caminos (al primer lugar y luego al siguiente).</p>
+          <div class="fila-control barra-filtros-upwork">
+            <div>
+              <label for="selectEstructuraCombo"><strong>Estructura del combo:</strong></label>
+              <select id="selectEstructuraCombo" style="margin-left: 6px;">
+                <option value="principal_bebida">Plato Fuerte / Rápida + Bebida (2 productos)</option>
+                <option value="principal_bebida_postre">Plato Fuerte / Rápida + Bebida + Postre (3 productos)</option>
+                <option value="snack_bebida">Desayuno / Frito / Snack + Bebida o Café (2 productos)</option>
+                <option value="snack_bebida_postre">Desayuno / Snack + Bebida + Postre (3 productos)</option>
+              </select>
+            </div>
+
+            <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13.5px;">
+              <input type="checkbox" id="checkComboMismoLocal" checked>
+              <strong>Comprar todo en el mismo lugar</strong> (desmarca para combinar entre 2 lugares y ver ambos caminos)
+            </label>
+          </div>
+          <div id="contenedorCombosRecomendados"></div>
+        </fieldset>
+
+        <!-- CAJA DE LOCALES RECOMENDADOS -->
+        <fieldset>
+          <legend>Restaurantes y Emprendimientos Recomendados</legend>
+          <div id="contenedorLocalesRecomendados"></div>
+        </fieldset>
+      </div>
+
+      <!-- PASO 4: PREGUNTAR DÓNDE SE ENCUENTRA EL USUARIO -->
+      <div id="seccionPaso4" class="paso-oculto">
+        <fieldset>
+          <legend>Paso 4: ¿En qué parte de la universidad estás ahora?</legend>
+          <p class="subtitulo-seccion">Selecciona el bloque, entrada o zona común desde donde vas a empezar a caminar.</p>
+
+          <div id="infoDestinoSeleccionadoPaso4" class="fila-control aviso-resumen"></div>
+
+          <div class="fila-control">
+            <label for="selectUbicacionPaso4"><strong>Búsqueda rápida de tu ubicación actual:</strong></label><br>
+            <select id="selectUbicacionPaso4" style="margin-top: 6px; min-width: 300px;"></select>
+          </div>
+
+          <div id="contenedorTarjetasUbicacion" class="grid-preferencias"></div>
+
+          <div class="acciones-paso">
+            <button type="button" id="btnVolverPaso3Desde4" class="btn-secundario">&larr; Volver al Menú</button>
+            <button type="button" id="btnIrPaso5" class="btn-primario">Ver Ruta Peatonal en el Mapa &rarr;</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- PASO 5: MOSTRAR EL MAPA CON EL CAMINO TRAZADO Y LAS INDICACIONES -->
+      <div id="seccionPaso5" class="paso-oculto">
+        <fieldset>
+          <legend>Paso 5: Ruta Peatonal por los Pasillos del Campus</legend>
+
+          <div class="fila-control" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button type="button" id="btnVolverPaso4Desde5" class="btn-secundario">&larr; Cambiar mi punto de partida</button>
+            <button type="button" id="btnVolverPaso3Desde5" class="btn-secundario">&larr; Elegir otra comida o restaurante</button>
+          </div>
+
+          <div id="resumenRutaPaso5" class="fila-control aviso-resumen"></div>
+
+          <div id="contenedorSelectorPuntoEmprendimientoPaso5" class="fila-control"></div>
+
+          <div class="barra-herramientas-mapa">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+              <strong>Encuadre del mapa:</strong>
+              <button type="button" id="btnZoomCompleto" class="btn-secundario">Mapa completo</button>
+              <button type="button" id="btnZoomCampus" class="btn-secundario">Zona central</button>
+              <button type="button" id="btnZoomRuta" class="btn-secundario">Acercar a mi ruta</button>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 13.5px;">
+              <strong>Al hacer clic en el mapa:</strong>
+              <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="radio" name="radioModoClicMapa" value="origen" checked>
+                Cambiar dónde estoy
+              </label>
+              <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="radio" name="radioModoClicMapa" value="destino">
+                Cambiar destino
+              </label>
+            </div>
+          </div>
+
+          <div class="leyenda-mapa">
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #008000;"></span> Tu ubicación actual</span>
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #d60000;"></span> Destino / Parada 1 (Camino 1)</span>
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #0055cc;"></span> Parada 2 en Combos (Camino 2)</span>
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #ff6600;"></span> Pasillos del recorrido</span>
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #7a00cc;"></span> Otras zonas del emprendedor</span>
+            <span class="item-leyenda"><span class="punto-leyenda" style="background: #3b6ea5;"></span> Otros bloques (clic para elegir)</span>
+          </div>
+
+          <!-- MAPA DEL CAMPUS EN ALTA RESOLUCIÓN CON EL CAMINO PEATONAL TRAZADO -->
+          <div class="contenedor-mapa">
+            <svg id="svgMapaRuta" viewBox="110 280 1260 1720" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+
+          <!-- TABLA DE PASOS DE LA RUTA -->
+          <div id="contenedorDetalleRuta"></div>
+        </fieldset>
+      </div>
+
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- PESTAÑA 2: REGISTRAR EMPRENDIMIENTO O PRODUCTO                       -->
+    <!-- ==================================================================== -->
+    <div id="vistaPestanaEmprendimientos" class="pestana-oculta">
+
+      <fieldset>
+        <legend>Publica tu Emprendimiento Estudiantil</legend>
+        <p class="subtitulo-seccion">Si vendes postres, snacks, almuerzos o bebidas en el campus, publica tu perfil para aparecer en las búsquedas y en el mapa peatonal.</p>
+
+        <div class="grid-formulario-emp">
+          <div>
+            <label for="inputNombreEmprendimiento"><strong>Nombre del emprendimiento:</strong></label>
+            <input type="text" id="inputNombreEmprendimiento" placeholder="Ej: Brownies del Norte">
+          </div>
+
+          <div>
+            <label for="inputContactoEmprendimiento"><strong>WhatsApp o Instagram de contacto:</strong></label>
+            <input type="text" id="inputContactoEmprendimiento" placeholder="Ej: 300 123 4567 o @browniesuninorte">
+          </div>
+
+          <div>
+            <label for="selectDisponibilidadEmp"><strong>Estado actual:</strong></label>
+            <select id="selectDisponibilidadEmp">
+              <option value="Disponible ahora">Disponible ahora (Entregando en el campus)</option>
+              <option value="Solo por encargo">Solo por encargo / reserva previa</option>
+              <option value="No disponible hoy">No disponible en este momento</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="selectHorarioEmp"><strong>Horario habitual en la U:</strong></label>
+            <select id="selectHorarioEmp">
+              <option value="Todo el día (8:00 a.m. - 6:00 p.m.)">Todo el día (8:00 a.m. - 6:00 p.m.)</option>
+              <option value="Jornada Mañana (7:30 a.m. - 12:30 p.m.)">Jornada Mañana (7:30 a.m. - 12:30 p.m.)</option>
+              <option value="Mediodía / Almuerzo (11:30 a.m. - 2:30 p.m.)">Mediodía / Almuerzo (11:30 a.m. - 2:30 p.m.)</option>
+              <option value="Jornada Tarde (12:30 p.m. - 6:30 p.m.)">Jornada Tarde (12:30 p.m. - 6:30 p.m.)</option>
+            </select>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>1. ¿En qué lugares del campus entregas o permaneces?</legend>
+
+          <div class="fila-control">
+            <label for="selectLugarPrincipalEmp"><strong>Tu punto principal más frecuente:</strong></label><br>
+            <select id="selectLugarPrincipalEmp" style="margin-top: 6px; min-width: 280px;"></select>
+          </div>
+
+          <div class="fila-control">
+            <strong>Marca otros bloques o zonas por donde te mueves o haces entregas:</strong>
+            <div id="contenedorLugaresFrecuentesEmp" class="grid-preferencias" style="margin-top: 10px;"></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>2. Catálogo de Productos que Vendes</legend>
+
+          <div class="grid-formulario-emp">
+            <div>
+              <label for="inputNombreProductoEmp"><strong>Nombre del producto:</strong></label>
+              <input type="text" id="inputNombreProductoEmp" placeholder="Ej: Brownie melcochudo con helado">
+            </div>
+
+            <div>
+              <label for="inputPrecioProductoEmp"><strong>Precio ($ COP):</strong></label>
+              <input type="number" id="inputPrecioProductoEmp" min="500" max="100000" step="100" value="5000">
+            </div>
+
+            <div>
+              <label for="selectCategoriaProductoEmp"><strong>Categoría general:</strong></label>
+              <select id="selectCategoriaProductoEmp"></select>
+            </div>
+
+            <div>
+              <label for="selectSubcategoriaProductoEmp"><strong>Subcategoría específica:</strong></label>
+              <select id="selectSubcategoriaProductoEmp"></select>
+            </div>
+          </div>
+
+          <div class="fila-control">
+            <button type="button" id="btnAgregarProductoTemporal" class="btn-secundario">+ Añadir producto a la lista</button>
+          </div>
+
+          <div id="contenedorProductosTemporales"></div>
+        </fieldset>
+
+        <div id="mensajeEstadoEmprendimiento" class="fila-control"></div>
+
+        <div class="acciones-paso">
+          <button type="button" id="btnLimpiarFormularioEmprendimiento" class="btn-secundario">Limpiar formulario</button>
+          <button type="button" id="btnGuardarEmprendimiento" class="btn-primario">Guardar Emprendimiento en el Catálogo</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Directorio de Emprendimientos Estudiantiles Registrados</legend>
+        <div id="contenedorEmprendimientosRegistrados"></div>
+      </fieldset>
+
+    </div>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="algorithms.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
